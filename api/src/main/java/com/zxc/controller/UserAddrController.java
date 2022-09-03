@@ -21,7 +21,7 @@ public class UserAddrController {
 
     @GetMapping("/list")
     @ApiImplicitParam(dataTypeClass = Integer.class,dataType = "int",name = "userId", value = "用户ID",required = true)
-    public ResultVO listAddr(Integer userId){
+    public ResultVO listAddr(Integer userId ,@RequestHeader("token") String token){
         return userAddrService.listAddrsByUid(userId);
     }
 

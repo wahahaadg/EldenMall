@@ -60,10 +60,9 @@
     <result column="original_price" jdbcType="VARCHAR" property="originalPrice" />
     <result column="sell_price" jdbcType="VARCHAR" property="sellPrice" />
     <result column="sku_name" jdbcType="VARCHAR" property="skuName" />
-    <result column="stock"  property="skuStock" />
   </resultMap>
 
-  <select id="selectShopcartByCids" resultMap="ShoppingCartVOMap2">
+  <select id="selectShopCartByCids" resultMap="ShoppingCartVOMap">
     select c.cart_id, c.product_id,  c.sku_id, c.user_id, c.cart_num, c.cart_time,
     c.product_price, c.sku_props,  p.product_name, i.url,s.original_price,s.sell_price,s.sku_name,s.stock
     from shopping_cart c

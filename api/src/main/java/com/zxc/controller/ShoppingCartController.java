@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author wahaha
@@ -35,7 +36,7 @@ public class ShoppingCartController {
 
     @GetMapping("/list")
     @ApiImplicitParam(dataTypeClass = Integer.class, dataType = "int", name = "userId", value = "用户Id", required = true)
-    @ApiOperation("购物车列表查询接口")
+    @ApiOperation("用户id查询购物车列表接口")
     public ResultVO listShoppingCartByUserId(Integer userId){
         return  shoppingCartService.listShoppingCartByUserId(userId);
     }
@@ -45,5 +46,12 @@ public class ShoppingCartController {
     public ResultVO updateCartNum( @PathVariable("cid") Integer cartId,
                                    @PathVariable("cnum") Integer cartNum){
         return shoppingCartService.updateCartNum(cartId, cartNum);
+    }
+
+    @GetMapping("/listbycids")
+    @ApiImplicitParam(dataTypeClass = String.class, dataType = "String", name = "cids", value = "购物车id列表", required = true)
+    @ApiOperation("购物车id查询购物车列表接口")
+    public ResultVO listShoppingCartByCids(String cids , @RequestHeader("token") String token){
+        return shoppingCartService.listShoppingCartByCids(cids);
     }
 }

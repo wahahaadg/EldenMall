@@ -3,6 +3,8 @@ package com.zxc.eldenmall.service;
 import com.zxc.eldenmall.entity.ShoppingCart;
 import com.zxc.eldenmall.vo.ResultVO;
 
+import java.util.List;
+
 /**
  * @author wahaha
  */
@@ -29,4 +31,11 @@ public interface ShoppingCartService {
      * @return 给前端的对象
      */
     public ResultVO updateCartNum(int cartId, int cartNum);
+
+    /**
+     * 根据一串购物车id查询内容
+     * @param cids 购物车id的集合
+     * @return 给前端的对象
+     */
+    public ResultVO listShoppingCartByCids(String cids);
 }

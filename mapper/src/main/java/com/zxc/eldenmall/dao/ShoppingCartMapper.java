@@ -21,6 +21,19 @@ public interface ShoppingCartMapper extends GeneralDAO<ShoppingCart> {
      */
     public List<ShoppingCartVO> selectShopcartByUserId(int userId);
 
+    /**
+     * 修改购物车数量接口
+     * @param cartId 购物车id
+     * @param cartNum 修改的数量
+     * @return 相应修改的数量
+     */
     public int updateCartNumByCartId(@Param("cartId") int cartId,
                                      @Param("cartNum") int cartNum);
+
+    /**
+     * 购物车列表显示接口
+     * @param cids 购物车id集合
+     * @return 列表
+     */
+    public List<ShoppingCartVO> selectShopCartByCids(List<Integer> cids);
 }

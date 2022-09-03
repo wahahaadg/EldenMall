@@ -34,6 +34,6 @@ public class ShoppingCartVO {
     /**
      * 库存
      */
-    private Integer skuStock;
+    //private Integer skuStock;
 }
 

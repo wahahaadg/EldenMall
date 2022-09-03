@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -49,5 +51,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         } else {
             return new ResultVO(ResStatus.NO, "寄", null);
         }
+    }
+
+    @Override
+    public ResultVO listShoppingCartByCids(String cids) {
+
+        String[] split = cids.split(",");
+        List<Integer> cartIds = new ArrayList<>();
+        for(String s : split){
+            cartIds.add(Integer.parseInt(s));
+        }
+
+        List<ShoppingCartVO> list = shoppingCartMapper.selectShopCartByCids(cartIds);
+        return new ResultVO(ResStatus.OK, "success", list);
     }
 }
