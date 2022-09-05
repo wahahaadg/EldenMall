@@ -13,7 +13,9 @@ import com.zxc.eldenmall.vo.ResStatus;
 import com.zxc.eldenmall.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -35,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private ProductSkuMapper productSkuMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, String> addOrder(String cids, Orders order) throws SQLException {
         /*logger.info("add order begin...");*/
         Map<String,String> map = new HashMap<>(8);
@@ -112,5 +114,48 @@ public class OrderServiceImpl implements OrderService {
 
         }
 
+    }
+
+    @Override
+    public int updateOrderStatus(String orderId, String status) {
+        Orders orders = new Orders();
+        orders.setOrderId(orderId);
+        orders.setStatus(status);
+        int i = ordersMapper.updateByPrimaryKeySelective(orders);
+        return i;
+    }
+
+    @Override
+    public ResultVO getOrderStatusById(String orderId) {
+        Orders orders = ordersMapper.selectByPrimaryKey(orderId);
+        return new ResultVO(ResStatus.OK, "success", orders.getStatus());
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE,rollbackFor = Exception.class)
+    public void closeOrder(String orderId) {
+        synchronized (this) {
+            //  1.修改当前订单：status=6 已关闭  close_type=1 超时未支付
+            Orders cancleOrder = new Orders();
+            cancleOrder.setOrderId(orderId);
+            //已关闭
+            cancleOrder.setStatus("6");
+            //关闭类型：超时未支付
+            cancleOrder.setCloseType(1);
+            ordersMapper.updateByPrimaryKeySelective(cancleOrder);
+
+            //  2.还原库存：先根据当前订单编号查询商品快照（skuid  buy_count）--->修改product_sku
+            Example example1 = new Example(OrderItem.class);
+            Example.Criteria criteria1 = example1.createCriteria();
+            criteria1.andEqualTo("orderId", orderId);
+            List<OrderItem> orderItems = orderItemMapper.selectByExample(example1);
+            //还原库存
+            for (OrderItem orderItem : orderItems) {
+                //修改
+                ProductSku productSku = productSkuMapper.selectByPrimaryKey(orderItem.getSkuId());
+                productSku.setStock(productSku.getStock() + orderItem.getBuyCounts());
+                productSkuMapper.updateByPrimaryKey(productSku);
+            }
+        }
     }
 }
